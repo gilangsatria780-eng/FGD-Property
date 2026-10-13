@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FGD Property - Portal Eksklusif Agen Properti</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Leaflet CSS (Peta) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        #map { height: 450px; width: 100%; z-index: 1; }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+    <!-- ========================================== -->
+    <!-- 1. HALAMAN LOGIN (GATING FORM)             -->
+    <!-- ========================================== -->
+    <div id="login-page" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+            <div class="text-center mb-6">
+                <span class="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full">FGD PROPERTY PORTAL</span>
+                <h1 class="text-2xl font-extrabold text-gray-900 mt-2">Akses Katalog Properti</h1>
+                <p class="text-xs text-gray-500 mt-1">Silakan masukkan data diri Anda untuk melihat daftar dan peta lokasi properti.</p>
+            </div>
+            
+            <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-600 mb-1">Alamat Email</label>
+                    <input type="email" id="user-email" required placeholder="contoh: nama@email.com" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-600 mb-1">Nomor WhatsApp</label>
+                    <input type="tel" id="user-wa" required placeholder="contoh: 08123456789" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+                <button type="submit" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition duration-200 shadow-md">
+                    Masuk ke Katalog &rarr;
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 2. HALAMAN UTAMA (HOMEPAGE & WEB PROPERTI)  -->
+    <!-- ========================================== -->
+    <div id="main-content" class="hidden">
+        
+        <!-- HEADER & MENU NAVIGASI -->
+        <header class="bg-white shadow-sm sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="bg-blue-600 text-white font-black text-lg px-3 py-1 rounded">FGD</span>
+                    <span class="font-bold text-lg text-gray-900">Property</span>
+                </div>
+                <nav class="flex space-x-8 text-sm font-semibold text-gray-600">
+                    <a href="#about" class="hover:text-blue-600 transition">Tentang Kami</a>
+                    <a href="#katalog" class="hover:text-blue-600 transition">Web Utama</a>
+                    <a href="#contact" class="hover:text-blue-600 transition">Contact</a>
+                    <a href="#address" class="hover:text-blue-600 transition">Address</a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- BANNER / HERO SECTION -->
+        <section class="relative bg-slate-900 text-white py-20 px-6 text-center">
+            <div class="absolute inset-0 opacity-40 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80');"></div>
+            <div class="relative max-w-3xl mx-auto">
+                <span class="bg-blue-500/30 border border-blue-400 text-blue-300 text-xs font-semibold px-3 py-1 rounded-full inline-block mb-3">Eksklusif & Terpercaya di Surabaya</span>
+                <h1 class="text-4xl font-extrabold mb-4">Temukan Hunian Impian Bersama FGD Property</h1>
+                <p class="text-gray-200 text-sm mb-6">Mitra konsultasi dan pemasaran properti terbaik yang menghadirkan kurasi hunian strategis dengan layanan profesional penuh.</p>
+                <a href="#katalog" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-lg shadow-lg inline-block transition">Jelajahi Katalog Peta</a>
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- 3. PROFIL PERUSAHAAN (COMPANY PROFILE)     -->
+        <!-- ========================================== -->
+        <section id="about" class="bg-white py-16 px-6 border-b">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center max-w-2xl mx-auto mb-12">
+                    <h2 class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">Tentang Perusahaan</h2>
+                    <h3 class="text-3xl font-extrabold text-gray-900">Mengenal Lebih Dekat FGD Property</h3>
+                    <p class="text-sm text-gray-600 mt-3">
+                        **FGD Property** adalah agensi konsultasi dan pemasaran properti independen yang berpusat di Surabaya. Kami mendedikasikan diri untuk membantu masyarakat menemukan instrumen investasi hunian maupun tempat tinggal ideal melalui penyajian data spasial dan kurasi properti yang transparan, aman, serta terpercaya.
+                    </p>
+                </div>
+
+                <!-- Kartu Layanan -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Layanan 1 -->
+                    <div class="bg-gray-50 p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-bold text-xl mb-4">🏠</div>
+                        <h4 class="font-bold text-lg text-gray-900 mb-2">Kurasi Properti Pilihan</h4>
+                        <p class="text-xs text-gray-600 leading-relaxed">
+                            Kami menyeleksi dan menyurvei langsung properti-properti potensial di kawasan strategis Surabaya agar Anda mendapatkan hunian dengan nilai investasi terbaik.
+                        </p>
+                    </div>
+
+                    <!-- Layanan 2 -->
+                    <div class="bg-gray-50 p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-bold text-xl mb-4">🗺️</div>
+                        <h4 class="font-bold text-lg text-gray-900 mb-2">Pemetaan & Analisis Spasial</h4>
+                        <p class="text-xs text-gray-600 leading-relaxed">
+                            Didukung pendekatan berbasis geospasial, kami menyajikan visualisasi peta interaktif yang memudahkan Anda meninjau jangkauan wilayah dan aksesibilitas properti.
+                        </p>
+                    </div>
+
+                    <!-- Layanan 3 -->
+                    <div class="bg-gray-50 p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition">
+                        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-bold text-xl mb-4">🤝</div>
+                        <h4 class="font-bold text-lg text-gray-900 mb-2">Pendampingan Transaksi</h4>
+                        <p class="text-xs text-gray-600 leading-relaxed">
+                            Tim agen profesional kami siap mendampingi Anda dari tahap penjadwalan survei, diskusi negosiasi, hingga proses legalitas transaksi hingga tuntas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- 4. KONTEN UTAMA: WEB UTAMA (KATALOG & PETA) -->
+        <!-- ========================================== -->
+        <section id="katalog" class="max-w-7xl mx-auto px-6 py-12">
+            <div class="mb-8 text-center">
+                <h2 class="text-2xl font-bold text-gray-900">Peta & Daftar Properti Pilihan</h2>
+                <p class="text-xs text-red-500 mt-1">*Lokasi di peta disamarkan ke tingkat kecamatan demi privasi. Hubungi agen untuk alamat presisi.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Sidebar List Properti -->
+                <div class="lg:col-span-1 bg-white p-4 rounded-xl shadow-md border h-[500px] overflow-y-auto" id="daftar-properti">
+                    <!-- List dimuat otomatis via JavaScript -->
+                </div>
+
+                <!-- Area Peta Leaflet -->
+                <div class="lg:col-span-2 bg-white p-2 rounded-xl shadow-md border">
+                    <div id="map" class="rounded-lg"></div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- 5. SECTION: CONTACT & ADDRESS              -->
+        <!-- ========================================== -->
+        <section class="bg-white border-t py-16 px-6">
+            <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
+                
+                <!-- Contact Agen -->
+                <div id="contact" class="bg-gray-50 p-8 rounded-2xl border shadow-sm">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                        <span class="text-blue-600 mr-2">📞</span> Contact FGD Property
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-6">Punya pertanyaan seputar jadwal survei, negosiasi, atau penitipan listing properti? Hubungi kontak resmi di bawah ini:</p>
+                    <ul class="space-y-3 text-sm font-medium">
+                        <li class="flex items-center text-gray-700">
+                            <span class="w-24 text-gray-400 font-normal">WhatsApp:</span> +62 812-3456-7890
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <span class="w-24 text-gray-400 font-normal">Email:</span> info@fgdproperty.com
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <span class="w-24 text-gray-400 font-normal">Jam Kerja:</span> Senin - Sabtu (08.00 - 17.00 WIB)
+                        </li>
+                    </ul>
+                    <a href="https://wa.me/6281234567890" target="_blank" 
+                       class="mt-6 bg-green-500 hover:bg-green-600 text-white text-sm font-bold px-5 py-3 rounded-lg block text-center transition">
+                       Chat Langsung via WhatsApp
+                    </a>
+                </div>
+
+                <!-- Address Agen -->
+                <div id="address" class="bg-gray-50 p-8 rounded-2xl border shadow-sm">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                        <span class="text-blue-600 mr-2">📍</span> Address Kantor Pemasaran
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-6">Kunjungi kantor operasional kami untuk konsultasi tatap muka terkait transaksi properti Anda:</p>
+                    <p class="text-sm font-medium text-gray-700 mb-4">
+                        <strong>Kantor Pusat FGD Property</strong><br>
+                        Jl. Raya MERR / Ir. Soekarno No. 88<br>
+                        Kec. Sukolilo, Kota Surabaya<br>
+                        Jawa Timur, 60111
+                    </p>
+                    <div class="text-xs text-blue-600 font-semibold bg-blue-50 p-3 rounded-lg border border-blue-200">
+                        💡 Tips: Disarankan membuat janji temu (*appointment*) via WhatsApp terlebih dahulu sebelum datang ke kantor.
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="bg-slate-900 text-white text-center py-6 text-xs">
+            <p>&copy; 2026 FGD Property. Hak Cipta Dilindungi.</p>
+        </footer>
+
+    </div>
+
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Logika Tombol Login
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById("user-email").value;
+            const wa = document.getElementById("user-wa").value;
+
+            if(email && wa) {
+                // Sembunyikan halaman login, tampilkan konten utama web
+                document.getElementById("login-page").classList.add("hidden");
+                document.getElementById("main-content").classList.remove("hidden");
+                
+                // Inisialisasi peta setelah elemennya muncul agar ukurannya akurat
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 200);
+            }
+        }
+
+        // Data Properti (Tanpa Harga)
+        const properti = [
+            {
+                id: 1,
+                judul: "Rumah Minimalis Rungkut",
+                luas: "LT: 90 m² | LB: 70 m²",
+                lokasiTxt: "Area Rungkut, dekat MERR",
+                lat: -7.3235,
+                lng: 112.7820,
+                foto: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=300&q=80",
+                status: "Ready"
+            },
+            {
+                id: 2,
+                judul: "Villa Keluarga Sukolilo",
+                luas: "LT: 120 m² | LB: 100 m²",
+                lokasiTxt: "Area Perumahan Sukolilo",
+                lat: -7.2855,
+                lng: 112.7932,
+                foto: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=300&q=80",
+                status: "Sold"
+            },
+            {
+                id: 3,
+                judul: "Townhouse Modern Gubeng",
+                luas: "LT: 150 m² | LB: 140 m²",
+                lokasiTxt: "Area Gubeng / Dharmahusada",
+                lat: -7.2650,
+                lng: 112.7530,
+                foto: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=300&q=80",
+                status: "Ready"
+            },
+            {
+                id: 4,
+                judul: "Rumah Compact Wonokromo",
+                luas: "LT: 72 m² | LB: 50 m²",
+                lokasiTxt: "Area Wonokromo / Jagir",
+                lat: -7.3010,
+                lng: 112.7450,
+                foto: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=300&q=80",
+                status: "Ready"
+            },
+            {
+                id: 5,
+                judul: "Cluster Exclusive Mulyorejo",
+                luas: "LT: 200 m² | LB: 180 m²",
+                lokasiTxt: "Area Mulyorejo, Pakuwon City",
+                lat: -7.2680,
+                lng: 112.8050,
+                foto: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=300&q=80",
+                status: "Sold"
+            }
+        ];
+
+        // Inisialisasi Peta
+        const map = L.map('map').setView([-7.2504, 112.7688], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        const wadahList = document.getElementById("daftar-properti");
+
+        // Looping Data Properti
+        properti.forEach((prop) => {
+            const isReady = prop.status === "Ready";
+            const badgeWarna = isReady ? "bg-green-100 text-green-700 border-green-300" : "bg-red-100 text-red-700 border-red-300";
+            const badgeTeks = isReady ? "🟢 READY" : "🔴 SOLD";
+
+            const tombolAksi = isReady ? `
+                <a href="https://wa.me/6281384680378?text=Halo%20FGD%20Property,%20saya%20tertarik%20dengan%20properti%20${prop.judul}" 
+                   target="_blank" 
+                   class="bg-green-500 text-white text-xs px-3 py-2 rounded block text-center hover:bg-green-600 transition font-medium">
+                   Tanya Harga & Detail (WA)
+                </a>
+            ` : `
+                <span class="bg-gray-300 text-gray-600 text-xs px-3 py-2 rounded block text-center font-medium cursor-not-allowed">
+                   Terjual (Sold Out)
+                </span>
+            `;
+
+            const isiPopup = `
+                <div class="p-1 w-48 font-sans">
+                    <div class="relative">
+                        <img src="${prop.foto}" alt="Rumah" class="w-full h-32 object-cover rounded mb-2 ${isReady ? '' : 'grayscale'}">
+                        <span class="absolute top-1 right-1 text-[10px] px-2 py-0.5 rounded font-bold border ${badgeWarna}">
+                            ${badgeTeks}
+                        </span>
+                    </div>
+                    <h3 class="font-bold text-sm mb-1 text-gray-800">${prop.judul}</h3>
+                    <p class="text-xs text-gray-700 mb-1">${prop.luas}</p>
+                    <p class="text-[10px] text-gray-500 italic mb-3">📍 ${prop.lokasiTxt}</p>
+                    ${tombolAksi}
+                </div>
+            `;
+
+            const marker = L.marker([prop.lat, prop.lng]).addTo(map);
+            marker.bindPopup(isiPopup);
+
+            const kartu = document.createElement("div");
+            const kartuStyle = isReady 
+                ? "bg-gray-50 hover:bg-blue-50 border-l-4 border-l-blue-500 cursor-pointer" 
+                : "bg-gray-100 border-l-4 border-l-gray-400 opacity-75 cursor-pointer";
+
+            kartu.className = `p-4 mb-3 border rounded shadow-sm hover:shadow-md transition duration-200 ${kartuStyle}`;
+            kartu.innerHTML = `
+                <div class="flex justify-between items-start mb-1">
+                    <h2 class="font-bold text-sm text-gray-800">${prop.judul}</h2>
+                    <span class="text-[9px] px-2 py-0.5 rounded font-bold border ${badgeWarna}">${badgeTeks}</span>
+                </div>
+                <p class="text-xs text-gray-600 font-medium mb-1">${prop.luas}</p>
+                <p class="text-xs text-gray-500">📍 ${prop.lokasiTxt}</p>
+            `;
+            
+            kartu.onclick = () => {
+                map.flyTo([prop.lat, prop.lng], 15, { duration: 1.5 });
+                marker.openPopup();
+            };
+
+            wadahList.appendChild(kartu);
+        });
+    </script>
+</body>
+</html>
